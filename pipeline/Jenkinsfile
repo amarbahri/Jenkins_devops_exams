@@ -39,26 +39,33 @@ stages {
                 steps {
                     script {
                         sh '''
+                        docker network create jenkins-pipeline
+                        '''
+                    }
+                    script {
+                        sh '''
                         docker run -d --name cast_db -e ${POSTGRES_CAST_USER} -e ${POSTGRES_CAST_PASSWORD} -e ${POSTGRES_CAST_DB} \
-                               postgres:12.1-alpine
+                               --network jenkins-pipeline postgres:12.1-alpine
                         '''
                     }
                     script {
                         sh '''
                         docker run -d --name movie_db -e ${POSTGRES_MOVIE_USER} -e ${POSTGRES_MOVIE_PASSWORD} -e ${POSTGRES_MOVIE_DB} \
-                               postgres:12.1-alpine
+                               --network jenkins-pipeline postgres:12.1-alpine
                         '''
                     }
                     script {
                     sh '''
-                    docker run -d -p 8001:8000 --name cast_service -e ${DATABASE_CAST_URI} $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG 
+                    docker run -d -p 8001:8000 --name cast_service -e ${DATABASE_CAST_URI} --network jenkins-pipeline \
+                           $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG 
                     sleep 10
                     '''
                     }
                 
                     script {
                     sh '''
-                    docker run  -d -p 8002:8000 --name movie_service -e ${DATABASE_MOVIE_URI} -e ${CAST_SERVICE_HOST_URL} $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
+                    docker run  -d -p 8002:8000 --name movie_service -e ${DATABASE_MOVIE_URI} -e ${CAST_SERVICE_HOST_URL} --network jenkins-pipeline \
+                           $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
                     sleep 10
                     '''
                     }
@@ -175,7 +182,8 @@ stage('Deploiement en staging'){
         script {
             sh '''
             docker stop movie_service cast_service movie_db cast_db && \
-            docker rm movie_service cast_service movie_db cast_db
+            docker rm movie_service cast_service movie_db cast_db && \
+            docker network rm jenkins-pipeline
             '''
         }
     }

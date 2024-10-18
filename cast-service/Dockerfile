@@ -1,8 +1,10 @@
 FROM python:3.8-slim
 
-WORKDIR /app
+WORKDIR /
 
-COPY ./requirements.txt .
+RUN mkdir /app
+
+COPY ./requirements.txt  /app
 
 RUN apt-get update \
     && apt-get install gcc -y \
@@ -11,6 +13,6 @@ RUN apt-get update \
 RUN pip install -r /app/requirements.txt \
     && rm -rf /root/.cache/pip
 
-COPY ./app/* .
+COPY ./app/ /app/
 
-CMD ["uvicorn", "main:app","--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app","--host", "0.0.0.0", "--port", "8000"]
