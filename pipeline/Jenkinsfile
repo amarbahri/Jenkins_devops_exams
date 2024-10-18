@@ -35,7 +35,7 @@ stages {
                 
                     script {
                     sh '''
-                    docker run  -d -p 8002:8000 --name movie_service $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
+                    docker run  -d -p 8002:8000 --name cast_service $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
                     sleep 10
                     '''
                     }
