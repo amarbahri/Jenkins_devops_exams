@@ -25,17 +25,40 @@ stages {
             }
         }
         stage('Docker run'){ // run container from our builded image
+                environment {
+                  DATABASE_MOVIE_URI = "DATABASE_URI=postgresql://movie_db_username:movie_db_password@movie_db/movie_db_dev"
+                  CAST_SERVICE_HOST_URL= "CAST_SERVICE_HOST_URL=http://cast_service:8000/api/v1/casts/"
+                  DATABASE_CAST_URI = "DATABASE_URI=postgresql://cast_db_username:cast_db_password@cast_db/cast_db_dev"
+                  POSTGRES_MOVIE_USER = "POSTGRES_USER=movie_db_username"
+                  POSTGRES_MOVIE_PASSWORD = "POSTGRES_PASSWORD=movie_db_password"
+                  POSTGRES_MOVIE_DB = "POSTGRES_DB=movie_db_dev"
+                  POSTGRES_CAST_USER = "POSTGRES_USER=cast_db_username"
+                  POSTGRES_CAST_PASSWORD = "POSTGRES_PASSWORD=cast_db_password"
+                  POSTGRES_CAST_DB = "POSTGRES_DB=cast_db_dev"
+                }
                 steps {
                     script {
+                        sh '''
+                        docker run -d --name cast_db -e ${POSTGRES_CAST_USER} -e ${POSTGRES_CAST_PASSWORD} -e ${POSTGRES_CAST_DB} \
+                               postgres:12.1-alpine
+                        '''
+                    }
+                    script {
+                        sh '''
+                        docker run -d --name movie_db -e ${POSTGRES_MOVIE_USER} -e ${POSTGRES_MOVIE_PASSWORD} -e ${POSTGRES_MOVIE_DB} \
+                               postgres:12.1-alpine
+                        '''
+                    }
+                    script {
                     sh '''
-                    docker run -d -p 8001:8000 --name movie_service $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
+                    docker run -d -p 8001:8000 --name cast_service -e ${DATABASE_CAST_URI} $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG 
                     sleep 10
                     '''
                     }
                 
                     script {
                     sh '''
-                    docker run  -d -p 8002:8000 --name cast_service $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
+                    docker run  -d -p 8002:8000 --name movie_service -e ${DATABASE_MOVIE_URI} -e ${CAST_SERVICE_HOST_URL} $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
                     sleep 10
                     '''
                     }
@@ -147,4 +170,13 @@ stage('Deploiement en staging'){
         }
 
 }
+  post {
+    always {
+        script {
+            sh '''
+            docker rm movie_service cast_service movie_db cast_db
+            '''
+        }
+    }
+  }
 }
