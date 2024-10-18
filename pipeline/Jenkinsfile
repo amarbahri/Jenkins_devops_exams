@@ -33,8 +33,7 @@ stages {
                     sleep 10
                     '''
                     }
-                }
-                steps {
+                
                     script {
                     sh '''
                     docker run --rm -d -p 8002:8000 --name movie_service $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
