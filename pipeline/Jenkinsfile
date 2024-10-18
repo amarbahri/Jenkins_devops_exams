@@ -15,8 +15,7 @@ stages {
                 sleep 6
                 '''
                 }
-            }
-            steps {
+            
                 script {
                 sh '''
                 docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG -f cast-service/ .
