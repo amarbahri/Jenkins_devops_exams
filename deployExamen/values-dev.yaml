@@ -1,0 +1,46 @@
+namespace: "dev"
+app: "cast-movie"
+
+version:
+  db: "12.1-alpine"
+  cast: "v.21.0"
+  movie: "v.21.0"
+
+replicatset:
+  cast: 1
+  movie: 1
+
+volume:
+  pv: "pv-data"
+  pvc: "db-data"
+
+db:
+  secret: 
+    cast: secret-cast
+    movie: secret-movie
+  port: 5432
+  image: postgres
+  cast: 
+    name: cast-db
+    dbname: cast_db_dev
+    service: cast-db
+  movie: 
+    name: movie-db
+    dbname: movie_db_dev
+    service: movie-db
+
+cast:
+  name: castapi
+  image: amarbahri/castfastapi
+  service: cast-svc
+  port: 8000
+
+movie:
+  name: movieapi
+  image: amarbahri/moviefastapi
+  service: movie-svc
+  port: 8000
+
+ingress:
+  host: jenkins-exam.amar-datascientest.cloudns.ch
+  port: 80

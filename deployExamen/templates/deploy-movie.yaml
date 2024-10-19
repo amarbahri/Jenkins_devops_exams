@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ .Values.movie.name }}
+  name: {{ .Values.movie.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicatset.movie }}
+  selector:
+    matchLabels:
+      app: {{ .Values.movie.name }}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.movie.name }}
+    spec:
+      containers:
+        - name: {{ .Values.movie.name }}
+          image: {{ .Values.movie.image }}:{{ .Values.version.movie }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URI
+              value: "postgresql://movie_db_username:movie_db_password@{{ .Values.db.movie.service }}/movie_db_dev"
+            - name: CAST_SERVICE_HOST_URL
+              value: "http://{{ .Values.cast.service }}:{{ .Values.cast.port }}/api/v1/casts/"
+          ports:
+            - containerPort: {{ .Values.movie.port }}
+

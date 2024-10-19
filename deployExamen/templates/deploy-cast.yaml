@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app:  {{ .Values.cast.name }}
+  name: {{ .Values.cast.name }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicatset.cast }}
+  selector:
+    matchLabels:
+      app:  {{ .Values.cast.name }}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app:  {{ .Values.cast.name }}
+    spec:
+      containers:
+        - name: {{ .Values.cast.name }}
+          image: {{ .Values.cast.image }}:{{ .Values.version.cast }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DATABASE_URI
+              value: "postgresql://cast_db_username:cast_db_password@{{ .Values.db.cast.service }}/cast_db_dev"
+          ports:
+            - containerPort: {{ .Values.cast.port }}
