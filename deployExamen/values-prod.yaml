@@ -1,4 +1,4 @@
-namespace: "dev"
+namespace: "prod"
 app: "cast-movie"
 
 version:
@@ -7,8 +7,8 @@ version:
   movie: "v.21.0"
 
 replicatset:
-  cast: 1
-  movie: 1
+  cast: 2
+  movie: 2
 
 volume:
   pv: 
@@ -46,5 +46,5 @@ movie:
   port: 8000
 
 ingress:
-  host: jenkins-exam.dev.amar-datascientest.cloudns.ch
+  host: jenkins-exam.prod.amar-datascientest.cloudns.ch
   port: 80

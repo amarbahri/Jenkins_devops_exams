@@ -1,4 +1,4 @@
-namespace: "dev"
+namespace: "staging"
 app: "cast-movie"
 
 version:
@@ -46,5 +46,5 @@ movie:
   port: 8000
 
 ingress:
-  host: jenkins-exam.dev.amar-datascientest.cloudns.ch
+  host: jenkins-exam.stg.amar-datascientest.cloudns.ch
   port: 80
