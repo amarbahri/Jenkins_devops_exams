@@ -11,17 +11,17 @@ stages {
             steps {
                 script {
                 sh '''
-                docker build -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG  ./movie-service/ && \
+                docker build $DOCKER_ID/$DOCKER_MOVIE_IMAGE  ./movie-service/ && \
                 sleep 6 && \
-                docker tag $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_MOVIE_IMAGE:latest
+                docker tag $DOCKER_ID/$DOCKER_MOVIE_IMAGE $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
                 '''
                 }
             
                 script {
                 sh '''
-                docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG  ./cast-service/ && \
+                docker build  $DOCKER_ID/$DOCKER_CAST_IMAGE  ./cast-service/ && \
                 sleep 6 && \
-                docker tag $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_CAST_IMAGE:latest
+                docker tag $DOCKER_ID/$DOCKER_CAST_IMAGE $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
                 '''
                 }
             }
