@@ -11,15 +11,17 @@ stages {
             steps {
                 script {
                 sh '''
-                docker build -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG  -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:latest ./movie-service/
-                sleep 6
+                docker build -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG  ./movie-service/ && \
+                sleep 6 && \
+                docker tag $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_MOVIE_IMAGE:latest
                 '''
                 }
             
                 script {
                 sh '''
-                docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG -t $DOCKER_ID/$DOCKER_CAST_IMAGE:latest ./cast-service/
-                sleep 6
+                docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG  ./cast-service/ && \
+                sleep 6 && \
+                docker tag $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_CAST_IMAGE:latest
                 '''
                 }
             }
@@ -99,8 +101,8 @@ stages {
                 sh '''
                 echo "push To DockerHub and tag latest"
                 docker login -u $DOCKER_ID -p $DOCKER_PASS
-                docker push -a $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
-                docker push -a $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG 
+                docker push -a $DOCKER_ID/$DOCKER_MOVIE_IMAGE
+                docker push -a $DOCKER_ID/$DOCKER_CAST_IMAGE 
                 '''
                 }
             }
@@ -171,7 +173,7 @@ stage('Deploiement en staging'){
         }
 
 }
-  post {
+  post('Cleanup') {
     always {
         script {
             sh '''
