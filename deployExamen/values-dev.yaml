@@ -11,8 +11,10 @@ replicatset:
   movie: 1
 
 volume:
-  pv: "pv-data"
-  pvc: "db-data"
+  pv: 
+    cast: "pv-cast"
+    movie: "pv-movie"
+
 
 db:
   secret: 
@@ -24,10 +26,12 @@ db:
     name: cast-db
     dbname: cast_db_dev
     service: cast-db
+    pvc: pvc-cast
   movie: 
     name: movie-db
     dbname: movie_db_dev
     service: movie-db
+    pvc: pvc-movie
 
 cast:
   name: castapi
