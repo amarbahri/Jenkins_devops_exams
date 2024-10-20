@@ -3,8 +3,7 @@ environment { // Declaration of environment variables
 DOCKER_ID = "amarbahri" // replace this with your docker-id
 DOCKER_MOVIE_IMAGE = "moviefastapi"
 DOCKER_CAST_IMAGE = "castfastapi"
-//DOCKER_TAG = "v.${BUILD_ID}.0" // we will tag our images with the current build in order to increment the value by 1 with each new build
-DOCKER_TAG = "v.21.0"
+DOCKER_TAG = "v.${BUILD_ID}.0" 
 }
 agent any // Jenkins will be able to select all available agents
 stages {
@@ -12,14 +11,14 @@ stages {
             steps {
                 script {
                 sh '''
-                #docker build -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG  ./movie-service/
+                docker build -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG  -t $DOCKER_ID/$DOCKER_MOVIE_IMAGE:latest ./movie-service/
                 sleep 6
                 '''
                 }
             
                 script {
                 sh '''
-                #docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG ./cast-service/
+                docker build -t $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG -t $DOCKER_ID/$DOCKER_CAST_IMAGE:latest ./cast-service/
                 sleep 6
                 '''
                 }
@@ -91,17 +90,17 @@ stages {
         stage('Docker Push'){ //we pass the built image to our docker hub account
             environment
             {
-                DOCKER_PASS = credentials("DOCKER_HUB_PASS") // we retrieve  docker password from secret text called docker_hub_pass saved on jenkins
+                DOCKER_PASS = credentials("DOCKER_HUB_PASS") 
             }
 
             steps {
 
                 script {
                 sh '''
-                echo "not push"
-                #docker login -u $DOCKER_ID -p $DOCKER_PASS
-                #docker push $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG
-                #docker push $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG
+                echo "push To DockerHub and tag latest"
+                docker login -u $DOCKER_ID -p $DOCKER_PASS
+                docker push $DOCKER_ID/$DOCKER_MOVIE_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_MOVIE_IMAGE:latest
+                docker push $DOCKER_ID/$DOCKER_CAST_IMAGE:$DOCKER_TAG $DOCKER_ID/$DOCKER_CAST_IMAGE:latest 
                 '''
                 }
             }
@@ -111,7 +110,7 @@ stages {
 stage('Deploiement en dev'){
         environment
         {
-        KUBECONFIG = credentials("k3sconfig") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        KUBECONFIG = credentials("k3sconfig") 
         }
             steps {
                 script {
@@ -129,7 +128,7 @@ stage('Deploiement en dev'){
 stage('Deploiement en staging'){
         environment
         {
-        KUBECONFIG = credentials("k3sconfig") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        KUBECONFIG = credentials("k3sconfig") 
         }
             steps {
                 script {
@@ -138,8 +137,6 @@ stage('Deploiement en staging'){
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
-                helm uninstall castmovieapi -n dev
-                sleep 30
                 helm upgrade --install castmovieapi deployExamen --values=deployExamen/values-stg.yaml --namespace staging
                 '''
                 }
@@ -152,11 +149,10 @@ stage('Deploiement en staging'){
             }
         environment
         {
-        KUBECONFIG = credentials("k3sconfig") // we retrieve  kubeconfig from secret file called config saved on jenkins
+        KUBECONFIG = credentials("k3sconfig") 
         }
             steps {
-            // Create an Approval Button with a timeout of 15minutes.
-            // this require a manuel validation in order to deploy on production environment
+            // need confirm to deploy prod
                     timeout(time: 15, unit: "MINUTES") {
                         input message: 'Do you want to deploy in production ?', ok: 'Yes'
                     }
@@ -167,8 +163,6 @@ stage('Deploiement en staging'){
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
-                helm uninstall castmovieapi -n staging
-                sleep 60
                 helm upgrade --install castmovieapi deployExamen --values=deployExamen/values-prod.yaml --namespace prod
                 '''
                 }

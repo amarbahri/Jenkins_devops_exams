@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.volume.pv.cast }}
+  name: {{ .Values.volume.pv.cast }}-{{ .Values.namespace }}
   labels:
     type: local
 spec:
@@ -11,7 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/postgres/cast-db
+    path: /mnt/postgres/{{ .Values.namespace }}/cast-db
   claimRef:
     namespace:  {{ .Values.namespace }}
     name: {{ .Values.db.cast.pvc }}
@@ -20,7 +20,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.volume.pv.movie }}
+  name: {{ .Values.volume.pv.movie }}-{{ .Values.namespace }}
   labels:
     type: local
 spec:
@@ -30,7 +30,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /mnt/postgres/movie-db
+    path: /mnt/postgres/{{ .Values.namespace }}/movie-db
   claimRef:
     namespace:  {{ .Values.namespace }}
     name: {{ .Values.db.movie.pvc }}
