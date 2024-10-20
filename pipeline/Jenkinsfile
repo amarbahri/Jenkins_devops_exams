@@ -138,6 +138,8 @@ stage('Deploiement en staging'){
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
+                helm uninstall castmovieapi -n dev
+                sleep 30
                 helm upgrade --install castmovieapi deployExamen --values=deployExamen/values-stg.yaml --namespace staging
                 '''
                 }
@@ -165,6 +167,8 @@ stage('Deploiement en staging'){
                 mkdir .kube
                 ls
                 cat $KUBECONFIG > .kube/config
+                helm uninstall castmovieapi -n staging
+                sleep 60
                 helm upgrade --install castmovieapi deployExamen --values=deployExamen/values-prod.yaml --namespace prod
                 '''
                 }

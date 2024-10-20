@@ -26,12 +26,12 @@ db:
     name: cast-db
     dbname: cast_db_dev
     service: cast-db
-    pvc: pvc-cast-dev
+    pvc: pvc-cast
   movie: 
     name: movie-db
     dbname: movie_db_dev
     service: movie-db
-    pvc: pvc-movie-dev
+    pvc: pvc-movie
 
 cast:
   name: castapi
