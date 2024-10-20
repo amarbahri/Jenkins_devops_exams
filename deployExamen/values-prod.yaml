@@ -3,8 +3,8 @@ app: "cast-movie"
 
 version:
   db: "12.1-alpine"
-  cast: "v.21.0"
-  movie: "v.21.0"
+  cast: "latest"
+  movie: "latest"
 
 replicatset:
   cast: 2
